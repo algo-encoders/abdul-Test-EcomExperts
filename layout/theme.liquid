@@ -313,6 +313,8 @@
         cart_url: '{{ routes.cart_url }}',
         predictive_search_url: '{{ routes.predictive_search_url }}',
       };
+      {% comment %} Setup bundle products data for frontend usage {% endcomment %}
+      window.bundles = '{{ settings.bundles }}'
 
       window.cartStrings = {
         error: `{{ 'sections.cart.cart_error' | t }}`,

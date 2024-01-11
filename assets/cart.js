@@ -103,8 +103,50 @@ class CartItems extends HTMLElement {
     ];
   }
 
-  updateQuantity(line, quantity, name, variantId) {
+  async updateQuantity(line, quantity, name, variantId) {
+
+           
     this.enableLoading(line);
+
+    // Check if this is bundle product then save it remove bundle
+    let bundlesData = window.bundles ?? "";
+    let removeBundle = null;
+    
+
+    if(quantity == 0 && bundlesData){
+      bundlesData = bundlesData.split("|");
+      if(bundlesData.length >= 1){
+        const firstBundle = bundlesData[0];
+        let bundledProducts = bundlesData[1];
+        bundledProducts = bundledProducts.split(",");
+
+        if(firstBundle){
+          
+
+          const cartData = await fetch('/cart.js');  
+          const CartDataJson = await cartData.json();  
+          let cartCount = 1;
+          for (const cartItem of CartDataJson.items) {
+
+            if(line == cartCount){
+              let innerCount = 1;
+              for (const cartItemInner of CartDataJson.items) {
+
+                if(bundledProducts.includes((cartItemInner.variant_id).toString())){
+                  removeBundle = cartItemInner.variant_id
+                }
+                   
+                innerCount++;
+              }
+
+            }
+
+            cartCount++            
+          }
+
+        }
+      }
+    }
 
     const body = JSON.stringify({
       line,
@@ -128,6 +170,8 @@ class CartItems extends HTMLElement {
           this.updateLiveRegions(line, parsedState.errors);
           return;
         }
+
+
 
         this.classList.toggle('is-empty', parsedState.item_count === 0);
         const cartDrawerWrapper = document.querySelector('cart-drawer');
@@ -174,9 +218,26 @@ class CartItems extends HTMLElement {
         const errors = document.getElementById('cart-errors') || document.getElementById('CartDrawer-CartErrors');
         errors.textContent = window.cartStrings.error;
       })
-      .finally(() => {
+      .finally(async () => {
         this.disableLoading(line);
+        // If there is remove Bundle product then remove it from cart as well
+        
+        if(removeBundle){    
+          const cartData = await fetch('/cart.js');  
+          const CartDataJson = await cartData.json();
+          let cartCount = 1;
+          for (const cartItem of CartDataJson.items) {
+            if(cartItem.variant_id == removeBundle){
+              this.updateQuantity(cartCount, 0);
+              break;
+            }
+            cartCount++            
+          }
+      }
       });
+
+
+
   }
 
   updateLiveRegions(line, message) {

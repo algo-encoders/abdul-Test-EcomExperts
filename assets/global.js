@@ -949,6 +949,19 @@ class VariantSelects extends HTMLElement {
   constructor() {
     super();
     this.addEventListener('change', this.onVariantChange);
+    this.unselect();
+  }
+
+  unselect(){
+
+    var sizeSelect = document.querySelector('[name="options[Size]"]');
+
+    // Unselect the currently selected option
+    sizeSelect.value = "";
+
+    // Create and dispatch a change event
+    var changeEvent = new Event('change');
+    this.dispatchEvent(changeEvent);
   }
 
   onVariantChange() {
@@ -1040,6 +1053,10 @@ class VariantSelects extends HTMLElement {
 
   setInputAvailability(listOfOptions, listOfAvailableOptions) {
     listOfOptions.forEach((input) => {
+      // Return if the dropdown is unselected not need to change option text
+      if(input.value == ""){
+        return;
+      }
       if (listOfAvailableOptions.includes(input.getAttribute('value'))) {
         input.innerText = input.getAttribute('value');
       } else {

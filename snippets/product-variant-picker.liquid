@@ -54,6 +54,15 @@
               name="options[{{ option.name | escape }}]"
               form="{{ product_form_id }}"
             >
+              {%- assign option_name = option.name | downcase -%}
+              {%- if option_name == 'size' -%}
+                <option
+                  value=""
+                  selected="selected"
+                >
+                Select Size
+                </option>
+              {%- endif -%}
               {% render 'product-variant-options', product: product, option: option, block: block %}
             </select>
             {% render 'icon-caret' %}

@@ -1465,5 +1465,16 @@
         "default": "background-1"
       }
     ]
+  },
+  {
+    "name": "Bundle Settings",
+    "settings": [
+      {
+        "type": "text",
+        "id": "bundles",
+        "label": "Bundle Data",
+        "info": "Add bundles like variant_id | bundled_variant_id, more_bundled_variant_id"
+      }
+    ]
   }
 ]

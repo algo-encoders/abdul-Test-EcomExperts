@@ -16,7 +16,7 @@ if (!customElements.get('product-form')) {
         this.hideErrors = this.dataset.hideErrors === 'true';
       }
 
-      onSubmitHandler(evt) {
+      async onSubmitHandler(evt) {
         evt.preventDefault();
         if (this.submitButton.getAttribute('aria-disabled') === 'true') return;
 
@@ -40,6 +40,35 @@ if (!customElements.get('product-form')) {
           this.cart.setActiveElement(document.activeElement);
         }
         config.body = formData;
+
+        //get current variant id
+        const currentVariant = this.querySelector('.product-variant-id').value;
+        let bundlesData = window.bundles ?? "";
+
+        if(bundlesData){
+          bundlesData = bundlesData.split("|");
+          if(bundlesData.length >= 1){
+            const firstBundle = bundlesData[0];
+            let bundledProducts = bundlesData[1];
+            bundledProducts = bundledProducts.split(",");
+
+            if(currentVariant == firstBundle){
+              // Add all bundled products in the cart because bundle is matched
+
+              for (const bundleProduct of bundledProducts) {
+                console.log("matched and adding", bundleProduct);
+                await fetch('/cart/add.js?id=' + bundleProduct, {
+                  method: 'POST',
+                  headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded',
+                  },
+                })
+                
+              }
+              
+            }
+          }
+        }
 
         fetch(`${routes.cart_add_url}`, config)
           .then((response) => response.json())
